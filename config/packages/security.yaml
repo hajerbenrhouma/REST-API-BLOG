@@ -1,0 +1,51 @@
+security:
+    # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
+    encoders:
+        App\Entity\User:
+            algorithm: auto
+            cost: 12
+    providers:
+        database:
+            entity:
+                class: App\Entity\User
+                property: username
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        api:
+            anonymous: true
+            stateless: true
+            pattern: ^/api
+            json_login:
+                check_path: /api/login_check
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+            guard:
+                authenticators:
+                    - App\Security\TokenAuthenticator
+                 #   - lexik_jwt_authentication.jwt_token_authenticator
+                 # Lexik\Bundle\JWTAuthenticationBundle\Security\Guard\JWTTokenAuthenticator
+            user_checker: App\Security\UserEnabledChecker
+        admin:
+            pattern: ^/
+            anonymous: true
+            form_login:
+                check_path: security_login
+                login_path: security_login
+                default_target_path: admin
+                use_referer: true
+            logout:
+                path: security_logout
+
+    access_control:
+#         - { path: ^/api/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+#         - { path: ^/api, roles:  [ROLE_SUPERADMIN, ROLE_ADMIN]  }
+         - { path: ^/api, roles:  IS_AUTHENTICATED_ANONYMOUSLY  }
+         - { path: ^/login, roles:  IS_AUTHENTICATED_ANONYMOUSLY  }
+         - { path: ^/admin, roles:  ROLE_SUPERADMIN  }
+
+    role_hierarchy:
+        ROLE_WRITER: ROLE_COMMENTATOR
+        ROLE_ADMIN: [ROLE_WRITER, ROLE_EDITOR]
+        ROLE_SUPERADMIN: ROLE_ADMIN

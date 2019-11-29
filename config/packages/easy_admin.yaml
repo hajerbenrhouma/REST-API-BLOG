@@ -1,0 +1,30 @@
+easy_admin:
+    entities:
+        BlogPost:
+            class: App\Entity\BlogPost
+            list:
+                actions: [ { name: 'Show' } ]
+            show:
+                fields:
+                    - id
+                    - title
+                    - published
+                    - { property: 'comments', template: 'easy_admin/BlogPost/comments.html.twig' }
+                    - images
+
+        Comment:
+            class: App\Entity\Comment
+
+        Image:
+            class: App\Entity\Image
+            list:
+                fields:
+                    - id
+                    - { property: 'url', type: 'image', label: 'Image' }
+            form:
+                fields:
+                    - { property: 'file', type: 'Vich\UploaderBundle\Form\Type\VichFileType', label: 'Image' }
+
+        User:
+            class: App\Entity\User
+            controller: App\Controller\UserAdminController
